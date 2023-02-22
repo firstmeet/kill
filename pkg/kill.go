@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var WhiteListName = []string{"telnet", "sh", "wget", "curl", "sudo", "ssh"}
+var WhiteListName = []string{"telnet", "sh", "sudo", "ssh"}
 
 type Element interface {
 	string | int | int32 | int64

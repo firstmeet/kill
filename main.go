@@ -12,14 +12,14 @@ import (
 
 func main() {
 	duration := flag.Int64("dd", 100, "")
-	whiteList := flag.String("w", "telnet,ssh,sh,wget,curl,sudo", "")
+	whiteList := flag.String("w", "telnet,ssh,sh,sudo", "")
 	pkg.WhiteListName = strings.Split(*whiteList, ",")
 	flag.Parse()
 	pids, names := pkg.GetNeedKillPids(*duration)
 	fmt.Println(names)
 	go killPids(pids)
 	go func() {
-		ticker := time.NewTicker(3 * time.Second)
+		ticker := time.NewTicker(1 * time.Second)
 		for {
 			select {
 			case <-ticker.C:
