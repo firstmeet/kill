@@ -2,13 +2,15 @@ package pkg
 
 import "C"
 import (
-	"github.com/shirou/gopsutil/process"
+	"fmt"
 	"os"
 	"os/exec"
 	"reflect"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/shirou/gopsutil/process"
 )
 
 var WhiteListName = []string{"telnet", "sh", "sudo", "ssh"}
@@ -27,7 +29,7 @@ func GetNeedKillPids(duration int64) ([]int32, []string) {
 	if len(pids) <= 0 {
 		return nil, nil
 	}
-	systemStartTime := getSystemStartTime()
+	systemStartTime := GetSystemStartTime()
 	if systemStartTime == 0 {
 		return nil, nil
 	}
@@ -66,7 +68,31 @@ func SelfPid() int {
 	pid := os.Getpid()
 	return pid
 }
-func getSystemStartTime() int64 {
+func KillPids(pids []int32) {
+	myPid := os.Getpid()
+	getppid := os.Getppid()
+	for _, pid := range pids {
+		if pid != int32(myPid) && pid != int32(getppid) {
+			newProcess, err := process.NewProcess(pid)
+			if err != nil {
+				continue
+			}
+			err = newProcess.Kill()
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+		}
+	}
+}
+func KillPid(process *process.Process) {
+	err := process.Kill()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+}
+func GetSystemStartTime() int64 {
 	command := exec.Command("cat", "/proc/uptime")
 	output, err := command.Output()
 	if err != nil {
